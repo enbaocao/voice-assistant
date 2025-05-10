@@ -20,6 +20,8 @@ def main():
                         help="Whisper model size to use for speech recognition")
     parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"],
                         help="Device to run Whisper model on")
+    parser.add_argument("--manual-stop", action="store_true", 
+                        help="Use manual stop mode (press Enter to stop recording) instead of automatic silence detection")
     
     args = parser.parse_args()
     
@@ -36,6 +38,12 @@ def main():
     print("- 'Create a new folder called project_data'")
     print("- 'Set up a new Next.js project named my-app'")
     print("- 'Clear the folder named temp'")
+    
+    if args.manual_stop:
+        print("\nUsing MANUAL STOP mode: Press Enter AGAIN when you're done speaking")
+    else:
+        print("\nUsing automatic silence detection: Recording will stop after a brief pause")
+        
     print("\nPress Ctrl+C to quit at any time.\n")
     
     try:
@@ -43,8 +51,19 @@ def main():
             print("\nPress Enter to start recording a command...")
             input()
             
-            # Record audio
-            audio_path = recorder.start_recording()
+            # Record audio (using manual or automatic mode)
+            if args.manual_stop:
+                # Start recording in a non-blocking way
+                recorder.start_recording(auto_detect_silence=False)
+                
+                # Wait for user to press Enter to stop recording
+                input("Recording... Press Enter when you're done speaking\n")
+                
+                # Manually stop the recording
+                audio_path = recorder.stop_recording()
+            else:
+                # Use automatic silence detection
+                audio_path = recorder.start_recording(auto_detect_silence=True)
             
             # Transcribe audio to text
             print("Transcribing...")
