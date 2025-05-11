@@ -1,0 +1,5 @@
+sounddevice
+soundfile
+openai-whisper
+mcp[cli]
+fastmcp

@@ -1,106 +1,66 @@
-# Voice Assistant
+# Voice Assistant with MCP
 
-A voice-controlled assistant that can perform tasks based on your spoken commands. This project allows you to record your voice, convert it to text, and execute commands without using a keyboard.
+A simple macOS application that:
+1. Records audio from your microphone
+2. Converts it to text using OpenAI's Whisper
+3. Sends the text to an MCP server to execute file operations
 
-## Features
+## Prerequisites
 
-- Voice recording with automatic silence detection
-- Speech-to-text conversion using Whisper models (local, no API costs)
-- Execute basic filesystem operations (create/delete files and folders)
-- Set up new projects (Next.js, Flask)
-- Expandable to integrate with any MCP-compatible LLM for more complex tasks
+- macOS
+- [Homebrew](https://brew.sh/)
+- Python 3.11+ 
+- ffmpeg
 
-## Requirements
+## Setup
 
-- Python 3.8+
-- PyAudio and related audio libraries
-- Whisper speech recognition model
-- Various Python packages (see Installation section)
-- Node.js & npm (for Next.js project initialization)
-
-## Installation
-
-1. Clone this repository
-2. Set up a virtual environment and install dependencies:
+1. Install required system dependencies:
 
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install pyaudio numpy sounddevice soundfile pydub faster-whisper requests transformers
+# Install Homebrew if not already installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Python and ffmpeg
+brew install python@3.11 ffmpeg
 ```
 
-3. For advanced LLM capabilities, set up a local MCP-compatible LLM server. Options include:
-   - [Ollama](https://ollama.ai/)
-   - [LocalAI](https://github.com/go-skynet/LocalAI)
-   - [llama.cpp server](https://github.com/ggerganov/llama.cpp)
+2. Create and activate a virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install Python dependencies:
+
+```bash
+pip install sounddevice soundfile openai-whisper "mcp[cli]" fastmcp
+```
+
+4. Install an MCP server (choose ONE):
+
+```bash
+# Option 1: Mac Shell - full shell + file operations
+npx @michaellatman/mcp-get@latest install cfdude-mac-shell
+
+# Option 2: Text Editor - line-oriented editor
+pip install mcp-text-editor
+```
 
 ## Usage
 
-Run the voice assistant:
+1. In one terminal, start the MCP server (use the appropriate command for your chosen server)
+
+2. In another terminal, run the voice assistant:
 
 ```bash
-python voice_assistant.py
+python record_and_edit.py
 ```
 
-For more options:
+3. Speak your command (example: "create a file named hello.txt with the contents Hello World")
 
-```bash
-python voice_assistant.py --help
-```
+## Security Considerations
 
-### Configuration Options
-
-- `--api-endpoint`: URL for an MCP-compatible LLM API server (optional)
-- `--whisper-model`: Whisper model size ("tiny", "base", "small", "medium", "large")
-- `--device`: Device to run models on ("cpu" or "cuda")
-
-Example with custom options:
-
-```bash
-python voice_assistant.py --whisper-model base --api-endpoint http://localhost:11434/v1/chat/completions
-```
-
-### Example Voice Commands
-
-- "Create a new folder called project_data"
-- "Delete the file named temp.txt"
-- "Clear the folder named cache"
-- "Set up a new Next.js project named my-website"
-- "Set up a new Flask project called api-server"
-
-## How It Works
-
-1. The assistant records your voice until it detects a pause (silence)
-2. The audio is converted to text using the Whisper model
-3. The command is processed:
-   - For simple file/folder operations, the command is parsed and executed directly
-   - For project setup, the assistant identifies project type and name, then uses appropriate tools
-   - For complex commands, the assistant can use an MCP-compatible LLM (if configured)
-
-## Project Structure
-
-```
-voice-assistant/
-├── src/
-│   ├── audio/
-│   │   ├── recorder.py       # Audio recording functionality
-│   │   └── transcriber.py    # Speech-to-text conversion
-│   ├── cli/
-│   │   └── main.py           # Command-line interface
-│   └── llm/
-│       ├── executor.py       # Processes commands via direct execution or LLM
-│       └── project_initializer.py  # Sets up different project types
-└── voice_assistant.py        # Main entry point
-```
-
-## Expanding the Assistant
-
-To expand the assistant's capabilities:
-
-1. Add new command patterns in `executor.py`
-2. Add new project types in `project_initializer.py`
-3. Connect to a more powerful LLM via the MCP protocol
-
-## License
-
-[MIT License](LICENSE)
+- The application is configured to operate within the current directory only
+- Review the transcribed text before sending to MCP
+- Configure your MCP server's security policy to restrict dangerous operations
