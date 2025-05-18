@@ -9,7 +9,6 @@ from fastmcp import FastMCP
 import os
 import subprocess
 import sys
-from fastmcp.transport.http import HTTPTransport
 
 # Directory where file operations are allowed
 WORKSPACE_DIR = os.getcwd()
@@ -109,7 +108,5 @@ def run_command(command):
 
 if __name__ == "__main__":
     print(f"Starting MCP server for file operations in {WORKSPACE_DIR}")
-    # Create HTTP transport with the desired port
-    http_transport = HTTPTransport(port=5000)
-    # Pass the transport to the run method
-    app.run(http_transport)
+    # Run with default transport (STDIO)
+    app.run()
